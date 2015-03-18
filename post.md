@@ -1,23 +1,22 @@
-
-### Useless background
+## Useless background
 
 About 8 months ago, I started looking around for solutions for how to test React components but didn't have any good ideas. I first tried out QUnit, which seemed to work fine, but I wanted it to be run automatically. I tried a qunit runner kind of like how the Ember.js project used to run tests, but that ended up being too cumbersome too. I switched over to Karma to test my components, and spent my time building my test assets and loading them up to Karma, but that ended up being kind of slow because I never cached the builds and ran a clean webpack build for each bundle. Ugh. Facebook went on to release Jest and I switched over. I thought it was great, but I quickly ran into some issues: 1) I don't like the module mocking that makes things look like black boxes, 2) I never actually wanted/needed black boxing, 3) it was slow, 4) it didn't install on all of my peers' computers without problem, 5) the documentation was lacking, 6) I had to come up with a hacky way to call it from Node, 7) it didn't work with io.js when I first tried it, 8) I didn't really know how to debug my tests other than by the really long stack traces, and the biggest thing I didn't like was that 9) it didn't run in a real browser.
 
 This post exists because 1) the guys writing react-router are GODS, 2) every other blog post on testing React components I've seen has been super freaking complicated, and 3) because this setup is the best thing I've found wrt React since pure rendering.
 
-# What does this look like when you've finished it?
+## What does this look like when you've finished it?
 
 ![Screen Shot 2015-02-21 at 7.32.17 PM.png](https://qiita-image-store.s3.amazonaws.com/0/42481/062116c4-ac2a-cf2e-fbea-922164ef9c23.png "Screen Shot 2015-02-21 at 7.32.17 PM.png")
 
-# Why would I want this?
+## Why would I want this?
 
 ![Screen Shot 2015-02-21 at 7.33.57 PM.png](https://qiita-image-store.s3.amazonaws.com/0/42481/463d71c8-4421-0066-1fbb-92c7503f8129.png "Screen Shot 2015-02-21 at 7.33.57 PM.png")
 
 When has testing and debugging with full sourcemaps been this easy???
 
-# Okay, how do I get this?
+## Okay, how do I get this?
 
-## Installation
+### Installation
 
 Dependencies you'll probably need:
 
@@ -32,11 +31,12 @@ Dependencies you'll probably need:
 * react -- well, this is what you use, right?
 * webpack -- webpack, the most amazing browser build tool ever
 
-## Configuration
+### Configuration
 
 Karma reads from a `karma.conf.js` file, so let's make sure we set it up right.
 
-```karma.conf.js
+```javascript
+//karma.conf.js
 var webpack = require('webpack');
 
 module.exports = function (config) {
@@ -68,16 +68,18 @@ module.exports = function (config) {
 
 Next, we need our single file, which will actually use the webpack require API to find the files we need automagically.
 
-```tests.webpack.js
+```javascript
+//tests.webpack.js
 var context = require.context('./src', true, /-test\.js$/); //make sure you have your directory and regex test set correctly!
 context.keys().forEach(context);
 ```
 
-## Write some tests
+### Write some tests
 
 Tests really just need to prove things like `1 === 1`, so let's make sure it's easy to understand.
 
-```root-test.js
+```javascript
+//root-test.js
 var React = require('react');
 var TestUtils = require('react/lib/ReactTestUtils'); //I like using the Test Utils, but you can just use the DOM API instead.
 var expect = require('expect');
@@ -91,26 +93,26 @@ describe('root', function () {
 });
 ```
 
-## Run the tests!
+### Run the tests!
 
 Just a simple `karma start` will run the tests once. `karma start --single-run=false` for multiple runs.
 
-# Conclusion
+## Conclusion
 
 And that's about it! Pretty minimal configuration to get a really nice testing environment set up. Big thanks to the react-router guys for having this up on GitHub to follow through.
 
-# References
+## References
 
 React-Router -- https://github.com/rackt/react-router/
 Karma -- http://karma-runner.github.io/0.12/index.html
 React TestUtils -- http://facebook.github.io/react/docs/test-utils.html
 My Example repo -- https://github.com/justinwoo/react-karma-webpack-testing/
 
-# Bonus
+## Bonus
 
 Making this work with Travis is trivial. Just do a few things.
 
-## Modify what browser will run in Travis
+### Modify what browser will run in Travis
 
 Travis only comes with Firefox, so we should change that accordingly.
 
@@ -120,7 +122,8 @@ Install the Firefox launcher, `karma-firefox-launcher`, and then change your kar
 
 Add a `.travis.yml` with the appropriate settings. You'll have to start up `xvfb` in Travis accordingly to make Firefox work.
 
-```.travis.yml
+```markup
+//.travis.yml
 language: node_js
 node_js:
   - "0.10"
